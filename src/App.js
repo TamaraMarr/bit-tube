@@ -1,7 +1,7 @@
 import React from "react";
 
 import Search from "./components/Search";
-import { fetchYTData } from "./services/fetchService";
+import { dataService } from "./services/DataService";
 import Video from "./components/Video";
 
 import "./App.css";
@@ -31,18 +31,13 @@ export default class App extends React.Component {
 			searchedVideo,
 			noResultsError: false
 		});
-
-		if (this.state.isThereHistory) {
-			this.setState({
-				videoHistory: [this.state.selectedVideo, ...this.state.videoHistory]
-			})
-		}
-
-		fetchYTData.loadData(searchedVideo, (videos) => {
+		
+		dataService.loadData(searchedVideo, (videos) => {
 			if (videos[0]) {
 				this.setState({
 					videos,
-					selectedVideo: videos[0]
+					selectedVideo: videos[0],
+					isThereHistory: true
 				});
 			} else {
 				this.setState({
@@ -51,9 +46,9 @@ export default class App extends React.Component {
 			}
 		});
 
-		if (this.state.videos.length !== 0) {
+		if (this.state.isThereHistory) {
 			this.setState({
-				isThereHistory: true
+				videoHistory: [this.state.selectedVideo, ...this.state.videoHistory]
 			})
 		}
 	}
@@ -87,8 +82,8 @@ export default class App extends React.Component {
 										
 									<h4 className="col-12 App_videoHeader">Viewing History</h4>
 									{this.state.isThereHistory
-										? this.state.videoHistory.map((video) => {
-											return <Video chosenVideo={video.id} width="565" height="315" />
+										? this.state.videoHistory.map((video, i) => {
+											return <Video chosenVideo={video.id} width="565" height="315" key={i} />
 											})
 										: <p className="offset-3 col-6">No videos in viewing history</p>}
 									</div>

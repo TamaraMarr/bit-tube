@@ -3,7 +3,7 @@ import YTSearch from "youtube-api-search";
 import { YOUTUBE_API_KEY } from "../constants";
 import Video from "./../entities/Video";
 
-class FetchYTData {
+class DataService {
     loadData(term, handleVideos) {
         const options = { term, key: YOUTUBE_API_KEY };
 
@@ -18,4 +18,4 @@ class FetchYTData {
     }
 }
 
-export const fetchYTData = new FetchYTData();
+export const dataService = new DataService();
