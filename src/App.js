@@ -77,10 +77,10 @@ export default class App extends React.Component {
 								<div className="col-8">
 								<div className="row">
 									<Video className="offset-1 col-10" chosenVideo={this.state.selectedVideo.id} width="665" height="415" />
-									<h4 className="col-12 App_videoHeader">{this.state.selectedVideo.title}</h4>
-									<p>{this.state.selectedVideo.description}</p>
+									<h4 className="offset-2 col-9 App_videoHeader">{this.state.selectedVideo.title}</h4>
+									<p className="offset-2 col-9">{this.state.selectedVideo.description}</p>
 										
-									<h4 className="col-12 App_videoHeader">Viewing History</h4>
+									<h4 className="offset-2 col-9 App_videoHeader">Viewing History</h4>
 									{this.state.isThereHistory
 										? this.state.videoHistory.map((video, i) => {
 											return <Video chosenVideo={video.id} width="565" height="315" key={i} />

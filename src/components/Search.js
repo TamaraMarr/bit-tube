@@ -34,7 +34,7 @@ export default class Search extends React.Component {
         return (
             <div className="col-12">
                 <div className="row">
-                    <input value={this.state.searchedVideo} onKeyPress={this.handleEnter} onChange={this.handleChange} className="offset-2 col-6 Search_input" />
+                    <input value={this.state.searchedVideo} onKeyPress={this.handleEnter} onChange={this.handleChange} placeholder="Search" className="offset-2 col-6 Search_input" />
                     <button onClick={() => this.props.sendSearchedVideo(this.state.searchedVideo)} className="col-2 btn Search_button">Search</button>
                 </div>
             </div>
