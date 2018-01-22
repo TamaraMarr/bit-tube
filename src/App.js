@@ -1,99 +1,108 @@
-import React, { Component } from 'react';
-import { fetchYTData } from './services/fetchService';
-import './App.css';
+import React from "react";
 
-class App extends Component {
+import Search from "./components/Search";
+import { fetchYTData } from "./services/fetchService";
+import Video from "./components/Video";
+
+import "./App.css";
+
+export default class App extends React.Component {
 	constructor() {
 		super();
 
 		this.state = {
 			searchedVideo: "",
+			videoHistory: [],
+			isThereHistory: false,
 			videos: [],
 			selectedVideo: {},
-			videoHistory: [],
-			isThereHistory: false
-		};
+			noResultsError: false
+		}
 
 		this.bindInit();
 	}
 
 	bindInit() {
-		this.handleEnter = this.handleEnter.bind(this);
+		this.searchVideo = this.searchVideo.bind(this);
 	}
 
-	handleChange = (event) => {
-		this.setState({ searchedVideo: event.target.value });
-	}
+    searchVideo(searchedVideo) {
+		this.setState({
+			searchedVideo,
+			noResultsError: false
+		});
 
-	searchVideo() {
 		if (this.state.isThereHistory) {
 			this.setState({
 				videoHistory: [this.state.selectedVideo, ...this.state.videoHistory]
 			})
 		}
 
-		fetchYTData.loadData(this.state.searchedVideo, (videos) => {
-			this.setState({
-				videos,
-				selectedVideo: videos[0],
-				isThereHistory: true
-			});
+		fetchYTData.loadData(searchedVideo, (videos) => {
+			if (videos[0]) {
+				this.setState({
+					videos,
+					selectedVideo: videos[0]
+				});
+			} else {
+				this.setState({
+					noResultsError: true
+				})
+			}
 		});
-	}
 
-	handleEnter(event) {
-		if (event.key === 'Enter') {
-			this.searchVideo();
+		if (this.state.videos.length !== 0) {
+			this.setState({
+				isThereHistory: true
+			})
 		}
 	}
 
 	render() {
-		if (!this.state.videos.length) {
+		if (this.state.videos.length === 0) {
 			return (
-				<div className="container">
+				<div className="container-fluid">
 					<div className="row">
-						<input value={this.state.searchedVideo} onKeyPress={this.handleEnter} onChange={this.handleChange} className="col-9" />
-						<button onClick={() => this.searchVideo()} className="col-2">Search</button>
-						<iframe width="560" height="315" src="https://www.youtube.com/embed/7hz5biZEejI" frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen className="col-11"></iframe>
+						<Search sendSearchedVideo={this.searchVideo} />
+						<div className="offset-3 col-6">
+							<Video chosenVideo="zDZFcDGpL4U" width="665" height="415" />
+						</div>
 					</div>
 				</div>
 			);
 		}
-
+		
 		return (
-			<div className="container">
+			<div className="container-fluid">
 				<div className="row">
-					<div className="col-12">
-						<div className="row header">
-							<input value={this.state.searchedVideo} onChange={this.handleChange} onKeyPress={this.handleEnter} className="col-9" />
-							<button onClick={() => this.searchVideo()} className="col-2">Search
-							</button >
-						</div>
-					</div>
-					<div className="col-8">
-						<div className="row">
-							<iframe className="col-12" width="560" height="315" src={`https://www.youtube.com/embed/${this.state.selectedVideo.id}`} frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen></iframe>
-							<h4 className="col-12">{this.state.selectedVideo.title}</h4>
-							<p className="col-12">{this.state.selectedVideo.description}</p>
-
-							{this.state.isThereHistory ? this.state.videoHistory.map((video) => {
-								return <iframe className="col-12" width="560" height="315" src={`https://www.youtube.com/embed/${video.id}`} frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen></iframe>
-							}) : ""}
-						</div>
-					</div>
-					<div className="col-4">
-						<div className="row">
-							<iframe className="col-12" width="560" height="315" src={`https://www.youtube.com/embed/${this.state.videos[1].id}`} frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen></iframe>
-							<iframe className="col-12" width="560" height="315" src={`https://www.youtube.com/embed/${this.state.videos[2].id}`} frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen></iframe>
-							<iframe className="col-12" width="560" height="315" src={`https://www.youtube.com/embed/${this.state.videos[3].id}`} frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen></iframe>
-							<iframe className="col-12" width="560" height="315" src={`https://www.youtube.com/embed/${this.state.videos[4].id}`} frameBorder="0" gesture="media" allow="encrypted-media" allowFullScreen></iframe>
-						</div>
-					</div>
+						<Search sendSearchedVideo={this.searchVideo} width="665" height="415" />
+						{this.state.noResultsError
+							? <p className="col-12" style={{ textAlign: "center", fontStyle: "italic" }}>No results for the given term</p>
+							: <div className="row">
+								<div className="col-8">
+								<div className="row">
+									<Video className="offset-1 col-10" chosenVideo={this.state.selectedVideo.id} width="665" height="415" />
+									<h4 className="col-12 App_videoHeader">{this.state.selectedVideo.title}</h4>
+									<p>{this.state.selectedVideo.description}</p>
+										
+									<h4 className="col-12 App_videoHeader">Viewing History</h4>
+									{this.state.isThereHistory
+										? this.state.videoHistory.map((video) => {
+											return <Video chosenVideo={video.id} width="565" height="315" />
+											})
+										: <p className="offset-3 col-6">No videos in viewing history</p>}
+									</div>
+								</div>
+								<div className="col-4">
+									<Video chosenVideo={this.state.videos[1].id} width="350" height="215" />
+									<Video chosenVideo={this.state.videos[2].id} width="350" height="215" />
+									<Video chosenVideo={this.state.videos[3].id} width="350" height="215" />
+									<Video chosenVideo={this.state.videos[4].id} width="350" height="215" />
+								</div>
+							  </div>
+						}
 				</div>
 			</div>
-
 		);
 	}
 }
-
-export default App;
